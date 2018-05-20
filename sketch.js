@@ -133,8 +133,8 @@ function setup() {
 
 	// for each point, assign rotation direction,
 	// frequency and color
-	// frequencies = ["bass", "low", "lowMid", "highMid", "treble"]
-	frequencies = ["mid", "highMid", "mid", "highMid", "treble"]
+	frequencies = ["bass", "low", "lowMid", "highMid", "treble"]
+	// frequencies = ["mid", "highMid", "mid", "highMid", "treble"]
 
 	for (var i = 0; i < n_points; i++) {
 		if (i % 2 == 0) {
@@ -211,7 +211,7 @@ function draw() {
 	}
 
 	// reset background for fade effect
-	background(0, 0, 0, 10);
+	background(0, 0, 0, 7);
 
 	// analyze the sound
   	var level = amplitude.getLevel();
