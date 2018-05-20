@@ -54,7 +54,7 @@ class Point {
 
 		// slowly increase opacity as time goes on
 		if (this.opacity < 95) {
-			this.opacity += .0005;
+			this.opacity += .005;
 		}
 
 		// fill and stroke for the arc
@@ -69,7 +69,7 @@ class Point {
 		// set up for the lines
 		var previous_location;
 		var rand_multiplier = 40 * Math.random();
-		var energy_multiplier = 2 * energy;
+		var energy_multiplier = i_global * energy;
 
 		// rotates the x and y coordinates using rotation matrix
 		var x_length = Math.cos(this.angle) * this.line_x_length - Math.sin(this.angle) * this.line_y_length;
@@ -82,8 +82,8 @@ class Point {
 			stroke(fill_red, fill_green, fill_blue, this.opacity);
 			strokeWeight(1);
 			
-			line(previous_location[0], previous_location[1], previous_location[0] + x_length * energy_multiplier / 2, 
-				previous_location[1] + y_length * energy_multiplier / 2);
+			line(previous_location[0], previous_location[1], previous_location[0] + x_length * energy_multiplier / 25, 
+				previous_location[1] + y_length * energy_multiplier / 25);
 			// line(previous_location[0], previous_location[1], previous_location[0] + x_length * energy_multiplier / 5 + energy_multiplier/2, 
 			// 	previous_location[1] + y_length * energy_multiplier / 5 + energy_multiplier/2);
 			// line(previous_location[0], previous_location[1], previous_location[0] + x_length * energy_multiplier / 5 - energy_multiplier/2, 
@@ -211,7 +211,7 @@ function draw() {
 	}
 
 	// reset background for fade effect
-	background(0, 0, 0, 7);
+	background(255, 255, 255, 50);
 
 	// analyze the sound
   	var level = amplitude.getLevel();
