@@ -202,7 +202,7 @@ function setup() {
 	// load the sound and start playing
 	mySound.setLoop(true);
 	mySound.setVolume(1.0);
-	mySound.jump(850);
+	mySound.play();
 
 	// use length of song to create break points
 	var total_song = 1015
