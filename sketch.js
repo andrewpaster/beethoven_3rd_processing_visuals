@@ -202,7 +202,7 @@ function setup() {
 	// load the sound and start playing
 	mySound.setLoop(true);
 	mySound.setVolume(1.0);
-	mySound.play();
+	mySound.jump(850);
 
 	// use length of song to create break points
 	var total_song = 1015
@@ -241,7 +241,7 @@ function draw() {
 		map(mySound.currentTime(), 0, mySound.duration(), 255, 41), 
 		map(mySound.currentTime(), 0, mySound.duration(), 255, 42), 
 		map(mySound.currentTime(), 0, mySound.duration(), 255, 224), 
-		map(energy, 20, 30, 100, 0));
+		map(energy, 20, 30, 40, 0));
 
 
   	for (var i = 0; i < n_points; i++) {
