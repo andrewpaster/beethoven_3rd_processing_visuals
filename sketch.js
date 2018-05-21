@@ -3,14 +3,14 @@ var i_global = 0;
 
 // point object
 class Point {
-	constructor(loc_x, loc_y, w, h, rotation, speed, angle, opacity, x_forward, freq_range, colors) {
+	constructor(loc_x, loc_y, w, h, rotation, speed, angle, opacity, x_forward, freq_range, colors, end_colors) {
 		this.loc_x = loc_x;
 		this.loc_y = loc_y;
 		this.w = w;
 		this.h = h;
 		this.previous_loc = [];
-		this.random_max = .1;
-		this.random_min = -.1;
+		this.random_max = 1;
+		this.random_min = -1;
 		this.rotation = rotation;
 		this.speed = speed;
 		this.angle = angle; 
@@ -19,18 +19,20 @@ class Point {
 		this.x_forward = x_forward;
 		this.opacity = opacity;
 		this.freq_range = freq_range;
-		this.colors = colors; // array with min/max colors
+		this.colors = colors; // colors where object begins at start
+		this.end_colors = end_colors // colors where object ends of animation
 	}
 
 	// updates the location and angle every time the draw function is called
-	update_locations(level, energy, centroid) {
+	update_locations(energy, centroid) {
 
 		// randomly move in the x direction with some given forward movement
 		this.loc_x += Math.round(Math.random() * (this.random_max - this.random_min) + this.random_min) + Math.random() * this.x_forward 
 		+ this.rotation * map(energy, 0, 255, 0, 1);
 
 		// randomly move in the y direction
-		this.loc_y += Math.round(Math.random() * (this.random_max - this.random_min)) + this.random_min + this.rotation * map(energy, 0, 255, 0, 1);	
+		this.loc_y += Math.round(Math.random() * (this.random_max - this.random_min)) + this.random_min + 
+		this.rotation * map(energy, 0, 255, 0, 1);	
 		
 		// move object across screen when hittings borders
 		this.loc_x = (this.loc_x + width) % width;
@@ -40,17 +42,17 @@ class Point {
 		this.previous_loc.push([this.loc_x, this.loc_y]);
 
 		// don't keep more previous locations than necessary
-		if (this.previous_loc.length >= 25) {
+		if (this.previous_loc.length >= 5) {
 			this.previous_loc.shift();
 		}
 
 		// increase rotation based on energy
-		this.angle += this.rotation * map(energy, 0, 255, 0, Math.PI/50);
+		this.angle += this.rotation * (map(energy, 0, 255, 0, Math.PI/360)  + map(mySound.currentTime(), 0, mySound.duration(), Math.PI/560, Math.PI/360));
 
 	}
 
 	// draw the object 
-	draw_object(level, energy, centroid, fill_red, fill_green, fill_blue) {
+	draw_object(energy, centroid, fill_red, fill_green, fill_blue) {
 
 		// slowly increase opacity as time goes on
 		if (this.opacity < 95) {
@@ -58,18 +60,17 @@ class Point {
 		}
 
 		// fill and stroke for the arc
-		fill(255, 255, centroid, this.opacity);
+		fill(255, 255, 255 + Math.random() * -6 + 3, this.opacity);
 		stroke(255, 255, 255, this.opacity);
 		strokeWeight(1);
 
 		var size = map(mySound.currentTime(), 0, mySound.duration(), 0, 25);
-		
 		arc(this.loc_x, this.loc_y, this.w + size, this.h + size, Math.random() * Math.PI, Math.PI);
 
 		// set up for the lines
 		var previous_location;
 		var rand_multiplier = 40 * Math.random();
-		var energy_multiplier = i_global * energy;
+		var energy_multiplier = map(mySound.currentTime(), 0, mySound.duration(), 1, 3) * energy;
 
 		// rotates the x and y coordinates using rotation matrix
 		var x_length = Math.cos(this.angle) * this.line_x_length - Math.sin(this.angle) * this.line_y_length;
@@ -79,19 +80,17 @@ class Point {
 		for (var p = 0; p < this.previous_loc.length; p++) {
 			previous_location = this.previous_loc[p];
 			fill(255, 255, centroid, centroid);
+
 			stroke(fill_red, fill_green, fill_blue, this.opacity);
 			strokeWeight(1);
 			
+
 			line(previous_location[0], previous_location[1], previous_location[0] + x_length * energy_multiplier / 25, 
 				previous_location[1] + y_length * energy_multiplier / 25);
-			// line(previous_location[0], previous_location[1], previous_location[0] + x_length * energy_multiplier / 5 + energy_multiplier/2, 
-			// 	previous_location[1] + y_length * energy_multiplier / 5 + energy_multiplier/2);
-			// line(previous_location[0], previous_location[1], previous_location[0] + x_length * energy_multiplier / 5 - energy_multiplier/2, 
-			// 	previous_location[1] + y_length * energy_multiplier / 5 - energy_multiplier/2);
-			line(previous_location[0], previous_location[1], previous_location[0] + x_length + this.rotation * energy_multiplier, 
-				previous_location[1] - y_length - energy_multiplier);
-			line(previous_location[0], previous_location[1], previous_location[0] - x_length/2 - this.rotation * energy_multiplier, 
-				previous_location[1] + y_length*2 + energy_multiplier);
+			line(previous_location[0], previous_location[1], previous_location[0] + x_length, 
+				previous_location[1] - y_length * energy_multiplier / 50);
+			line(previous_location[0], previous_location[1], previous_location[0] - x_length/2 * energy_multiplier / 50, 
+				previous_location[1] + y_length*2);
 
 		}
 
@@ -129,12 +128,11 @@ function setup() {
 	var rotation;
 
 
-	n_points = 25; // number of objects
+	n_points = 30; // number of objects
 
 	// for each point, assign rotation direction,
 	// frequency and color
-	frequencies = ["bass", "low", "lowMid", "highMid", "treble"]
-	// frequencies = ["mid", "highMid", "mid", "highMid", "treble"]
+	frequencies = ["bass", "lowMid", "mid", "highMid", "treble"]
 
 	for (var i = 0; i < n_points; i++) {
 		if (i % 2 == 0) {
@@ -144,38 +142,54 @@ function setup() {
 			rotation = -1;
 		}
 		
-		frequency_range = Math.floor(Math.random() * 5)
-		color_range = Math.floor(Math.random() * 5)
+		frequency_range = Math.floor(Math.random() * 5);
+		color_range = frequency_range;
 
 		if (color_range == 0) {
-			colors = [85, 150, 85, 150, 200, 255];
+			colors = [2, 12, 2, 127, 2, 69];
+			end_colors = [2, 127, 2, 2, 2, 40];
 		}
 		else if (color_range == 1) {
-			colors = [0, 0, 20, 50, 200, 255];
+			colors = [2, 101, 2, 255, 2, 177];
+			end_colors = [2, 255, 2, 80, 2, 134];
 		}
 		else if (color_range == 2) {
-			colors = [20, 50, 20, 50, 20, 50];
+			colors = [2, 24, 2, 255, 2, 138];
+			end_colors = [2, 255, 2, 4, 2, 81];
 		}
 		else if (color_range == 3) {
-			colors = [155, 210, 0, 40, 0, 0];
+			colors = [2, 50, 2, 127, 2, 88];
+			end_colors = [2, 127, 2, 40, 2, 67];
 		}
 		else {
-			colors = [85, 150, 85, 100, 0, 0];
+			colors = [2, 19, 2, 204, 2, 110];
+			end_colors = [2, 204, 2, 3, 2, 65];
 		}
 
-		points.push(new Point(Math.random() * width, Math.random() * height, 10, 10, 
-			rotation, Math.random() * .1, Math.random()*2*Math.PI, 0, Math.random()*.1 - .1, frequencies[frequency_range], colors));
+		points.push(new Point(Math.random() * width, // x starting value on canvass
+			Math.random() * height, // y starting value on canvass
+			10, // arc width
+			10, // arc height
+			rotation, // rotate counter-clockwise (1) or clockwise (-1)
+			Math.random() * .1, // rotation speed
+			Math.random()*2*Math.PI, // rotation starting angle
+			50, // starting opacity
+			Math.random()*.1 - .1, // general x movement (forwards or backwards) 
+			frequencies[frequency_range],  // frequency range represented by the object
+			colors, // color of the object
+			end_colors // color at end of animation
+			));
 	}
 
 	// change point zero and one to tell more of a story
-	points[0].opacity = 25;
-	points[1].opacity = 25;
+	points[0].opacity = 255;
+	points[1].opacity = 255;
 	points[0].x_forward = .05;
 	points[1].x_forward = -.08;
 	points[0].freq_range = "total";
 	points[1].freq_range = "total";
-	points[0].colors = [85, 150, 85, 150, 0, 0];
-	points[1].colors = [85, 150, 85, 150, 0, 0];
+	points[0].colors = [2, 237, 2, 237, 2, 147];
+	points[1].colors = [4, 237, 4, 237, 4, 147];
 	points[0].loc_x = width / 2 - 70;
 	points[0].loc_y = height / 2 - 30;	
 	points[1].loc_x = points[0].loc_x + 70; 
@@ -210,32 +224,37 @@ function draw() {
 	  	}
 	}
 
-	// reset background for fade effect
-	background(255, 255, 255, 50);
-
 	// analyze the sound
-  	var level = amplitude.getLevel();
 	var spectrum = fft.analyze();
 	var energy = fft.getEnergy(20, 20000);
-	var energy_division = [fft.getEnergy("bass"), 
-		fft.getEnergy("lowMid"), 
-		fft.getEnergy("mid"), 
-		fft.getEnergy("highMid"), 
-		fft.getEnergy("treble")]
+	var energy_factor = map(mySound.currentTime(), 0, mySound.duration(), 20, 3);
+	var energy_division = [energy/energy_factor + fft.getEnergy("bass") / 2, 
+		energy/energy_factor + fft.getEnergy("lowMid") / 2, 
+		energy/energy_factor + fft.getEnergy("mid") / 3, 
+		energy/energy_factor + fft.getEnergy("highMid") * 1.5, 
+		energy/energy_factor + fft.getEnergy("treble") * 1.5];
 	var centroid = fft.getCentroid();
-	level = map(level, 0, 1, 0, 255);
 	centroid = map(centroid, 0, 8000, 0, 255);
 
+	// reset background for fade effect
+	background(
+		map(mySound.currentTime(), 0, mySound.duration(), 255, 41), 
+		map(mySound.currentTime(), 0, mySound.duration(), 255, 42), 
+		map(mySound.currentTime(), 0, mySound.duration(), 255, 224), 
+		map(energy, 20, 30, 100, 0));
 
-  	for (var i = 0; i < i_global; i++) {
+
+  	for (var i = 0; i < n_points; i++) {
   		// use total energy for the first two points
   		if (points[i].freq_range != "total") {
 	  		energy = energy_division[energy_dict[points[i].freq_range]];
 	  	}
-  		points[i].draw_object(level, energy, centroid, 
-  			Math.round(Math.random() * points[i].colors[0] + points[i].colors[1]), 
-  			Math.round(Math.random() * points[i].colors[2] + points[i].colors[3]), 
-  			Math.round(Math.random() * points[i].colors[4] + points[i].colors[5]));
-  		points[i].update_locations(level, energy , centroid);
+	  	points[i].opacity = map(energy, 0, 255, 0, 255);
+	  	console.log(energy);
+  		points[i].draw_object(energy, centroid, 
+  			Math.round(Math.random() * points[i].colors[0] * points[i].rotation + map(mySound.currentTime(), 0, mySound.duration(), points[i].colors[1], points[i].end_colors[1])), 
+  			Math.round(Math.random() * points[i].colors[2] * points[i].rotation + map(mySound.currentTime(), 0, mySound.duration(), points[i].colors[3], points[i].end_colors[3])), 
+  			Math.round(Math.random() * points[i].colors[4] * points[i].rotation + map(mySound.currentTime(), 0, mySound.duration(), points[i].colors[5], points[i].end_colors[5])));
+  		points[i].update_locations(energy, centroid);
   	}
 }
