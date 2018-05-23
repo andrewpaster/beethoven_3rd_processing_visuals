@@ -1,3 +1,6 @@
+// count increases after a time block has passed
+var i_global = 0;
+
 // point object
 class Point {
 	constructor(loc_x, loc_y, w, h, rotation, speed, angle, opacity, x_forward, freq_range, colors, end_colors) {
@@ -98,7 +101,7 @@ class Point {
 // load the files
 function preload() {
   soundFormats('mp3', 'ogg');
-  mySound = loadSound('Beethoven.mp3');
+  mySound = loadSound('beethoven.ogg');
 
 }
 
@@ -201,16 +204,31 @@ function setup() {
 	mySound.setVolume(1.0);
 	mySound.play();
 
+	// use length of song to create break points
+	var total_song = 1015
+	break_points = []
+	for (var i = 0; i < n_points; i++) {
+		break_points.push(Math.floor(i * total_song / n_points)); 
+	}
+	current_time = break_points[0]; // track current point in the break
 }
 
 
 function draw() {
 	
+	// check if a time point has past and then increase the global counter
+	if (mySound.currentTime() > current_time) {
+		current_time = break_points.shift();
+		if (i_global < points.length) {
+	  		i_global++;
+	  	}
+	}
+
 	// analyze the sound
 	var spectrum = fft.analyze();
 	var energy = fft.getEnergy(20, 20000);
 	var energy_factor = map(mySound.currentTime(), 0, mySound.duration(), 20, 3);
-	var energy_division = [energy/energy_factor + fft.getEnergy("bass"), 
+	var energy_division = [energy/energy_factor + fft.getEnergy("bass") / 2, 
 		energy/energy_factor + fft.getEnergy("lowMid") / 2, 
 		energy/energy_factor + fft.getEnergy("mid") / 3, 
 		energy/energy_factor + fft.getEnergy("highMid") * 1.5, 
