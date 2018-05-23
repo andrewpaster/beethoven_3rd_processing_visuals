@@ -210,7 +210,7 @@ function draw() {
 	var spectrum = fft.analyze();
 	var energy = fft.getEnergy(20, 20000);
 	var energy_factor = map(mySound.currentTime(), 0, mySound.duration(), 20, 3);
-	var energy_division = [energy/energy_factor + fft.getEnergy("bass"), 
+	var energy_division = [energy/energy_factor + fft.getEnergy("bass")/1.5, 
 		energy/energy_factor + fft.getEnergy("lowMid") / 2, 
 		energy/energy_factor + fft.getEnergy("mid") / 3, 
 		energy/energy_factor + fft.getEnergy("highMid") * 1.5, 
