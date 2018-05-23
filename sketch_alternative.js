@@ -101,7 +101,7 @@ class Point {
 // load the files
 function preload() {
   soundFormats('mp3', 'ogg');
-  mySound = loadSound('beethoven.ogg');
+  mySound = loadSound('Beethoven.mp3');
 
 }
 

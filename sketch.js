@@ -98,7 +98,7 @@ class Point {
 // load the files
 function preload() {
   soundFormats('mp3', 'ogg');
-  mySound = loadSound('Beethoven.mp3');
+  mySound = loadSound('beethoven.ogg');
 
 }
 
@@ -210,11 +210,11 @@ function draw() {
 	var spectrum = fft.analyze();
 	var energy = fft.getEnergy(20, 20000);
 	var energy_factor = map(mySound.currentTime(), 0, mySound.duration(), 20, 3);
-	var energy_division = [energy/energy_factor + fft.getEnergy("bass")/1.5, 
-		energy/energy_factor + fft.getEnergy("lowMid") / 2, 
-		energy/energy_factor + fft.getEnergy("mid") / 3, 
-		energy/energy_factor + fft.getEnergy("highMid") * 1.5, 
-		energy/energy_factor + fft.getEnergy("treble") * 1.5];
+	var energy_division = [energy/energy_factor + fft.getEnergy("bass")/2, 
+		energy/energy_factor + fft.getEnergy("lowMid")/2, 
+		energy/energy_factor + fft.getEnergy("mid")/2, 
+		energy/energy_factor + fft.getEnergy("highMid")*3, 
+		energy/energy_factor + fft.getEnergy("treble")*3];
 	var centroid = fft.getCentroid();
 	centroid = map(centroid, 0, 8000, 0, 255);
 
@@ -223,8 +223,7 @@ function draw() {
 		map(mySound.currentTime(), 0, mySound.duration(), 255, 41), 
 		map(mySound.currentTime(), 0, mySound.duration(), 255, 42), 
 		map(mySound.currentTime(), 0, mySound.duration(), 255, 224), 
-		map(energy, 20, 30, 40, 0));
-
+		map(energy, 10, 45, 80, 0));
 
   	for (var i = 0; i < n_points; i++) {
   		// use total energy for the first two points
@@ -232,7 +231,6 @@ function draw() {
 	  		energy = energy_division[energy_dict[points[i].freq_range]];
 	  	}
 	  	points[i].opacity = map(energy, 0, 255, 0, 255);
-	  	console.log(energy);
   		points[i].draw_object(energy, centroid, 
   			Math.round(Math.random() * points[i].colors[0] * points[i].rotation + map(mySound.currentTime(), 0, mySound.duration(), points[i].colors[1], points[i].end_colors[1])), 
   			Math.round(Math.random() * points[i].colors[2] * points[i].rotation + map(mySound.currentTime(), 0, mySound.duration(), points[i].colors[3], points[i].end_colors[3])), 
