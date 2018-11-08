@@ -14,7 +14,7 @@ To see the results, go to this link:
 
 To get the project working on a local machine, do the following:
 1. Obtain an mp3 or ogg file of Beethoven's 3rd Symphony Mvt One: Allegro 
-con brio. You can find a creative commons version [here](https://imslp.org/wiki/Symphony_No.3%2C_Op.55_(Beethoven%2C_Ludwig_van)) Note that the sketch.js was tuned to work well with this file
+con brio. You can find a creative commons version [here](https://imslp.org/wiki/Symphony_No.3%2C_Op.55_(Beethoven%2C_Ludwig_van)). Note that the sketch.js was tuned to work well with this file
 
 2. Download the repository locally
 
@@ -24,7 +24,7 @@ the file name you downloaded.
 4. Start a local web server inside the repository. For example, from the terminal, you can use the command `python3 -m http.server` to start a local
 server with port 8000.
 
-5. Open a web browser and point to http://0.0.0.0:8000/ or where 8000 is the
+5. Open a web browser and point to http://0.0.0.0:8000/ where 8000 is the
 server port opened in the previous step.
 
 6. In the browser, open the sketch.js file.
