@@ -9,7 +9,6 @@ To see the results, go to this link:
 # Files in this Repository
 * processing.html - boilerplate code for processing.js CDN and loading sketch.js
 * sketch.js - processing code for the visualization
-* sketh_alternative.js
 
 # Getting Started
 
